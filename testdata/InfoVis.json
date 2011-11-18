@@ -1,0 +1,335 @@
+{
+    "children": [
+        {
+            "children": [
+                {
+                    "children": [
+                        {
+                            "data": {
+                                "description": "automatic-color-selection/.git/hooks", 
+                                "$color": "#8e 35 e0", 
+                                "typec": ".sample", 
+                                "sizec": 14044, 
+                                "lvl": 3, 
+                                "types": ".sample", 
+                                "size": 14044
+                            }, 
+                            "id": "../../automatic-color-selection/.git/hooks", 
+                            "name": "automatic-color-selection/.git/hooks"
+                        }, 
+                        {
+                            "data": {
+                                "description": "automatic-color-selection/.git/info", 
+                                "$color": "#6b 5b 90", 
+                                "typec": "[none]", 
+                                "sizec": 240, 
+                                "lvl": 3, 
+                                "types": "[none]", 
+                                "size": 240
+                            }, 
+                            "id": "../../automatic-color-selection/.git/info", 
+                            "name": "automatic-color-selection/.git/info"
+                        }, 
+                        {
+                            "children": [
+                                {
+                                    "children": [
+                                        {
+                                            "data": {
+                                                "description": "automatic-color-selection/.git/logs/refs/heads", 
+                                                "$color": "#1d 29 93", 
+                                                "typec": "[none]", 
+                                                "sizec": 310, 
+                                                "lvl": 5, 
+                                                "types": "[none]", 
+                                                "size": 310
+                                            }, 
+                                            "id": "../../automatic-color-selection/.git/logs/refs/heads", 
+                                            "name": "automatic-color-selection/.git/logs/refs/heads"
+                                        }, 
+                                        {
+                                            "children": [
+                                                {
+                                                    "data": {
+                                                        "description": "automatic-color-selection/.git/logs/refs/remotes/origin", 
+                                                        "$color": "#6a c8 5b", 
+                                                        "typec": "[none]", 
+                                                        "sizec": 134, 
+                                                        "lvl": 6, 
+                                                        "types": "[none]", 
+                                                        "size": 134
+                                                    }, 
+                                                    "id": "../../automatic-color-selection/.git/logs/refs/remotes/origin", 
+                                                    "name": "automatic-color-selection/.git/logs/refs/remotes/origin"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }, 
+                        {
+                            "children": [
+                                {
+                                    "data": {
+                                        "description": "automatic-color-selection/.git/objects/06", 
+                                        "$color": "#8a 63 a7", 
+                                        "typec": "[none]", 
+                                        "sizec": 98, 
+                                        "lvl": 4, 
+                                        "types": "[none]", 
+                                        "size": 98
+                                    }, 
+                                    "id": "../../automatic-color-selection/.git/objects/06", 
+                                    "name": "automatic-color-selection/.git/objects/06"
+                                }, 
+                                {
+                                    "data": {
+                                        "description": "automatic-color-selection/.git/objects/63", 
+                                        "$color": "#44 d9 1b", 
+                                        "typec": "[none]", 
+                                        "sizec": 127, 
+                                        "lvl": 4, 
+                                        "types": "[none]", 
+                                        "size": 127
+                                    }, 
+                                    "id": "../../automatic-color-selection/.git/objects/63", 
+                                    "name": "automatic-color-selection/.git/objects/63"
+                                }, 
+                                {
+                                    "data": {
+                                        "description": "automatic-color-selection/.git/objects/69", 
+                                        "$color": "#55 38 69", 
+                                        "typec": "[none]", 
+                                        "sizec": 60, 
+                                        "lvl": 4, 
+                                        "types": "[none]", 
+                                        "size": 60
+                                    }, 
+                                    "id": "../../automatic-color-selection/.git/objects/69", 
+                                    "name": "automatic-color-selection/.git/objects/69"
+                                }, 
+                                {
+                                    "data": {
+                                        "description": "automatic-color-selection/.git/objects/6f", 
+                                        "$color": "#89 98 43", 
+                                        "typec": "[none]", 
+                                        "sizec": 162, 
+                                        "lvl": 4, 
+                                        "types": "[none]", 
+                                        "size": 162
+                                    }, 
+                                    "id": "../../automatic-color-selection/.git/objects/6f", 
+                                    "name": "automatic-color-selection/.git/objects/6f"
+                                }, 
+                                {
+                                    "data": {
+                                        "description": "automatic-color-selection/.git/objects/8d", 
+                                        "$color": "#a2 ad 42", 
+                                        "typec": "[none]", 
+                                        "sizec": 1932, 
+                                        "lvl": 4, 
+                                        "types": "[none]", 
+                                        "size": 1932
+                                    }, 
+                                    "id": "../../automatic-color-selection/.git/objects/8d", 
+                                    "name": "automatic-color-selection/.git/objects/8d"
+                                }, 
+                                {
+                                    "data": {
+                                        "description": "automatic-color-selection/.git/objects/91", 
+                                        "$color": "#a5 c0 d9", 
+                                        "typec": "[none]", 
+                                        "sizec": 78, 
+                                        "lvl": 4, 
+                                        "types": "[none]", 
+                                        "size": 78
+                                    }, 
+                                    "id": "../../automatic-color-selection/.git/objects/91", 
+                                    "name": "automatic-color-selection/.git/objects/91"
+                                }, 
+                                {
+                                    "data": {
+                                        "description": "automatic-color-selection/.git/objects/9c", 
+                                        "$color": "#83 74 21", 
+                                        "typec": "[none]", 
+                                        "sizec": 563, 
+                                        "lvl": 4, 
+                                        "types": "[none]", 
+                                        "size": 563
+                                    }, 
+                                    "id": "../../automatic-color-selection/.git/objects/9c", 
+                                    "name": "automatic-color-selection/.git/objects/9c"
+                                }, 
+                                {
+                                    "data": {
+                                        "description": "automatic-color-selection/.git/objects/a3", 
+                                        "$color": "#e7 2a 7a", 
+                                        "typec": "[none]", 
+                                        "sizec": 3090, 
+                                        "lvl": 4, 
+                                        "types": "[none]", 
+                                        "size": 3090
+                                    }, 
+                                    "id": "../../automatic-color-selection/.git/objects/a3", 
+                                    "name": "automatic-color-selection/.git/objects/a3"
+                                }, 
+                                {
+                                    "data": {
+                                        "description": "automatic-color-selection/.git/objects/ce", 
+                                        "$color": "#af 82 6c", 
+                                        "typec": "[none]", 
+                                        "sizec": 134, 
+                                        "lvl": 4, 
+                                        "types": "[none]", 
+                                        "size": 134
+                                    }, 
+                                    "id": "../../automatic-color-selection/.git/objects/ce", 
+                                    "name": "automatic-color-selection/.git/objects/ce"
+                                }, 
+                                {
+                                    "data": {
+                                        "description": "automatic-color-selection/.git/objects/info", 
+                                        "$color": "#61 5e 12", 
+                                        "typec": "NULL", 
+                                        "sizec": 0, 
+                                        "lvl": 4, 
+                                        "types": "NULL", 
+                                        "size": 0
+                                    }, 
+                                    "id": "../../automatic-color-selection/.git/objects/info", 
+                                    "name": "automatic-color-selection/.git/objects/info"
+                                }, 
+                                {
+                                    "data": {
+                                        "description": "automatic-color-selection/.git/objects/pack", 
+                                        "$color": "#8d 64 98", 
+                                        "typec": "NULL", 
+                                        "sizec": 0, 
+                                        "lvl": 4, 
+                                        "types": "NULL", 
+                                        "size": 0
+                                    }, 
+                                    "id": "../../automatic-color-selection/.git/objects/pack", 
+                                    "name": "automatic-color-selection/.git/objects/pack"
+                                }
+                            ]
+                        }, 
+                        {
+                            "children": [
+                                {
+                                    "data": {
+                                        "description": "automatic-color-selection/.git/refs/heads", 
+                                        "$color": "#cd 89 b1", 
+                                        "typec": "[none]", 
+                                        "sizec": 41, 
+                                        "lvl": 4, 
+                                        "types": "[none]", 
+                                        "size": 41
+                                    }, 
+                                    "id": "../../automatic-color-selection/.git/refs/heads", 
+                                    "name": "automatic-color-selection/.git/refs/heads"
+                                }, 
+                                {
+                                    "children": [
+                                        {
+                                            "data": {
+                                                "description": "automatic-color-selection/.git/refs/remotes/origin", 
+                                                "$color": "#11 78 3e", 
+                                                "typec": "[none]", 
+                                                "sizec": 41, 
+                                                "lvl": 5, 
+                                                "types": "[none]", 
+                                                "size": 41
+                                            }, 
+                                            "id": "../../automatic-color-selection/.git/refs/remotes/origin", 
+                                            "name": "automatic-color-selection/.git/refs/remotes/origin"
+                                        }
+                                    ]
+                                }, 
+                                {
+                                    "data": {
+                                        "description": "automatic-color-selection/.git/refs/tags", 
+                                        "$color": "#9f d4 bd", 
+                                        "typec": "NULL", 
+                                        "sizec": 0, 
+                                        "lvl": 4, 
+                                        "types": "NULL", 
+                                        "size": 0
+                                    }, 
+                                    "id": "../../automatic-color-selection/.git/refs/tags", 
+                                    "name": "automatic-color-selection/.git/refs/tags"
+                                }
+                            ]
+                        }
+                    ]
+                }, 
+                {
+                    "data": {
+                        "description": "automatic-color-selection/src", 
+                        "$color": "#92 5c 93", 
+                        "typec": ".py", 
+                        "sizec": 58293, 
+                        "lvl": 2, 
+                        "types": ".json", 
+                        "size": 58293
+                    }, 
+                    "id": "../../automatic-color-selection/src", 
+                    "name": "automatic-color-selection/src"
+                }, 
+                {
+                    "data": {
+                        "description": "automatic-color-selection/testdata", 
+                        "$color": "#49 69 83", 
+                        "typec": ".json", 
+                        "sizec": 3270, 
+                        "lvl": 2, 
+                        "types": ".json", 
+                        "size": 3270
+                    }, 
+                    "id": "../../automatic-color-selection/testdata", 
+                    "name": "automatic-color-selection/testdata"
+                }
+            ]
+        }, 
+        {
+            "data": {
+                "description": "folder1", 
+                "$color": "#8e 1f cd", 
+                "typec": "NULL", 
+                "sizec": 0, 
+                "lvl": 1, 
+                "types": "NULL", 
+                "size": 0
+            }, 
+            "id": "../../folder1", 
+            "name": "folder1"
+        }, 
+        {
+            "data": {
+                "description": "folder2", 
+                "$color": "#91 04 de", 
+                "typec": "NULL", 
+                "sizec": 0, 
+                "lvl": 1, 
+                "types": "NULL", 
+                "size": 0
+            }, 
+            "id": "../../folder2", 
+            "name": "folder2"
+        }, 
+        {
+            "data": {
+                "description": "old", 
+                "$color": "#c0 28 02", 
+                "typec": ".py", 
+                "sizec": 48719, 
+                "lvl": 1, 
+                "types": ".py", 
+                "size": 48719
+            }, 
+            "id": "../../old", 
+            "name": "old"
+        }
+    ]
+}
