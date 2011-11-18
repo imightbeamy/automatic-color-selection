@@ -1,3 +1,4 @@
+#!/usr/bin/python
 from time import sleep
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -48,8 +49,8 @@ def main():
   
 def hues_to_rgb(hues_map, lightness = .5, saturation = .5):
   colors = {}
-  for node in hues.keys():
-    colors[node] = HSL_to_RGB(hues[node], lightness, saturation)
+  for node in hues_map.keys():
+    colors[node] = HSL_to_RGB(hues_map[node], lightness, saturation)
   return colors
   
 def displyConstraintGraph(graph, colors=None, save_img=False, filename='ConstraintGraph'):
@@ -89,8 +90,8 @@ def buildConstraintGraph(nodes, edges, **kwargs):
   weight_key = kwargs.get('weight_key', 'weight')
   similar = kwargs.get('similar_type', 'similar')
   dissimilar = kwargs.get('dissimilar_type', 'dissimilar')
-  label_key = kwargs.get('label_key', 'label')
   id_key = kwargs.get('id_key', 'id')
+  label_key = kwargs.get('label_key', id_key)
   
   G=nx.Graph()
   for node in nodes:
@@ -139,7 +140,7 @@ def color_distance(hue1, hue2):
 def getColors(contraint_graph, start_random = True, min_velocity = .001,	momentum_damper = 0.5, 
               velocity_damper = 0.9999, max_iterations = 10000, force_limit = .5, 
               max_separation = .3, 
-              separation_wight = .5, adjacency_wight = 1.0, level_wight = .2 ):
+              separation_wight = .2, adjacency_wight = .5, level_wight = 1.0 ):
   """Return a value between 0 and 1 that repesents the
   distance between the hues on the color circle. This
   distance function is defined in equation 3 of the paper.

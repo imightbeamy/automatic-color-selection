@@ -30,11 +30,8 @@ def main():
     infoVis_file.close()
     
 # Generate the InfoVis formatted data for a path
-def gen_infoVis_format(path, root, include_hidden=False):
+def gen_infoVis_format(path, root, color_map=None, include_hidden=False):
     for dirname, dirnames, filenames in os.walk(path):
-        # Generate a random color
-        # (to be replaced by the color algorithm)
-        random_color = '#' + string.join(['%02x'%randint(0,255) for i in range(3)],'')
       
         # Calculate the level
         dirnameshort = dirname.replace(root + "/", "").replace(root, "")
@@ -42,19 +39,27 @@ def gen_infoVis_format(path, root, include_hidden=False):
         level = 0
         if dirnameshort:
             level = dirnameshort.count("/") + 1
+            
+        if color_map:
+          color = color_map['./' + dirnameshort]
+          print color
+        else:
+          #random color
+          color = '#' + string.join(['%02x'%randint(0,255) for i in range(3)],'')
+          
         children = []
         for dir in dirnames:
             if include_hidden or dir[0] != '.':
-              children.append(gen_infoVis_format(os.path.join(dirname, dir), root))
+              children.append(gen_infoVis_format(os.path.join(dirname, dir), root, color_map=color_map))
         data = {}
         data['description'] = dirnameshort
-        data['size'] = get_dir_size(dirname)
+        data['size'] = data['$angularWidth'] = get_dir_size(dirname)
         data['sizec'] = get_dir_size_including_children(dirname)
         data['typec'] = get_dir_common_count(dirname)
         data['types'] = get_dir_common_size(dirname)
-        data['$color'] = random_color
+        data['$color'] = color
         data['lvl'] = level
-        node = {'data': data, 'id': dirname, 'name': dirnameshort, 'children': children}
+        node = {'data': data, 'id': dirname, 'name': dirnameshort or 'root', 'children': children}
         return node
     return []
 
