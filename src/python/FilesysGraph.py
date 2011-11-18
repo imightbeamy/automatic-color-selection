@@ -1,9 +1,12 @@
 #!/usr/bin/python
 import sys
 import os
-import random 
+from random import randint
+import json
+import string
 
-random.seed()
+CHILD_EDGE = 'child'
+NEIGHBOR_EDGE = 'neighbor'
 
 def main():
     # Default path is the current directory
@@ -13,128 +16,101 @@ def main():
     if len(sys.argv) > 1:
         path = sys.argv[1]
     
-    nodes_edges = nodes_edges_to_json(path)
+    nodes_edges = gen_filesys_graph(path)
 
-    infoVis_json = nodes_to_infoVis_format(path, path)
+    infoVis_json = gen_infoVis_format(path, path)
+    prefix = ''
+    if len(sys.argv) > 2:
+      prefix = sys.argv[2] + '_'
+    colorsel_file = open(prefix + 'colorselection.json', 'w') 
+    infoVis_file = open(prefix + 'infoVis.json', 'w') 
+    json.dump(nodes_edges, colorsel_file, indent=4)
+    json.dump(infoVis_json, infoVis_file, indent=4)
+    colorsel_file.close()
+    infoVis_file.close()
     
-    print "Data for Amy:"
-    print nodes_edges
-    print ""
-    print "InfoVis json:"
-    print infoVis_json
-
 # Generate the InfoVis formatted data for a path
-def nodes_to_infoVis_format(path, root):
+def gen_infoVis_format(path, root, include_hidden=False):
     for dirname, dirnames, filenames in os.walk(path):
-        
         # Generate a random color
         # (to be replaced by the color algorithm)
-        random_color = ""
-        for i in range(3):
-            random_color += hex(random.randrange(0, 255, 1))[2:]
-        while len(random_color) < 6:
-            random_color += "0"
-        
+        random_color = '#' + string.join(['%02x'%randint(0,255) for i in range(3)],'')
+      
         # Calculate the level
-        level = 0
-        level_temp = dirname.replace(root + "/", "")
-        level_temp = level_temp.replace(root, "")
-        spaces = ""
-        if len(level_temp) != 0:
-            level = level_temp.count("/") + 1
-        out = "\n\t{\"children\": ["
-        for dir in dirnames:
-            out += nodes_to_infoVis_format(os.path.join(dirname, dir), root)
-        if out[-1] == ",":
-            out = out[:-1]
-        out += "],"
-        out += "\n\t\"data\": {\n"
-        dirnameshort = dirname.replace(root, "./").replace("//", "/")
-        out += "\t\"description\": \"" + dirnameshort + "\", \n"
-        out += "\t\"size\": " + str(get_dir_size(dirname)) + ", \n"
-        out += "\t\"sizec\": " + str(get_dir_size_including_children(dirname)) + ", \n"
-        out += "\t\"typec\": \"" + get_dir_common_count(dirname) + "\", \n"
-        out += "\t\"types\": \"" + get_dir_common_size(dirname) + "\", \n"
-        out += "\t\"$color\": \"#" + random_color + "\", \n"
-        out += "\t\"lvl\": " + str(level) + ""
-        out += "},\n"
-        out += "\t\"id\": \"" + dirname + "\", "
-        out += "\n\t\"name\": \"" + dirnameshort + "\""
-        out += "\n\t},"
-        for i in range(level):
-            spaces += "     "
-        out = out.replace("\t", spaces)
-        out = out[:-1]
-        if path == root:
-            out = out[1:]
-        return out
-    return ""
+        dirnameshort = dirname.replace(root + "/", "").replace(root, "")
 
+        level = 0
+        if dirnameshort:
+            level = dirnameshort.count("/") + 1
+        children = []
+        for dir in dirnames:
+            if include_hidden or dir[0] != '.':
+              children.append(gen_infoVis_format(os.path.join(dirname, dir), root))
+        data = {}
+        data['description'] = dirnameshort
+        data['size'] = get_dir_size(dirname)
+        data['sizec'] = get_dir_size_including_children(dirname)
+        data['typec'] = get_dir_common_count(dirname)
+        data['types'] = get_dir_common_size(dirname)
+        data['$color'] = random_color
+        data['lvl'] = level
+        node = {'data': data, 'id': dirname, 'name': dirnameshort, 'children': children}
+        return node
+    return []
+
+def isHiddenPath(path):
+  path = os.path.abspath(path).split('/')
+  return [dir for dir in path if dir and dir[0]=='.'] != []
 
 # Generate the data for the nodes and edges
-def nodes_edges_to_json(path):
+def gen_filesys_graph(path, include_hidden=False):
     nodes = []
     edges = []
     
     # Walk the path and get the directories
     for dirname, dirnames, filenames in os.walk(path):
-        
-        # Calculate the level
-        level = 0
-        level_temp = dirname.replace(path + "/", "")
-        level_temp = level_temp.replace(path, "")
-        if len(level_temp) != 0:
-            level = level_temp.count("/") + 1
-        
-        # Put each node into the list of nodes, with dir size and 
-        # size including children
-        dirnameshort = dirname.replace(path, "./").replace("//", "/")
-        dirsize = get_dir_size(dirname)
-        dirsizec = get_dir_size_including_children(dirname)
-        dirfilecount = get_dir_common_count(dirname)
-        dirfilesize = get_dir_common_size(dirname)
-        nodes.append([dirnameshort, level, dirsize, dirsizec, dirfilecount, dirfilesize])
-        
-        # Create parent-child relationships in the edges
-        for subdirname in dirnames:
-            edges.append([dirnameshort, os.path.join(dirnameshort,subdirname), "child"])
-            
-            # Create neighbor relationships in the edges
-            for neighbor in dirnames:
-                
-                # Don't create an edge to self
-                if neighbor == subdirname:
-                    continue
-                
-                # Make up a neighbor node, sorted (this prevents duplicates)
-                temp = sorted([os.path.join(dirnameshort,subdirname),os.path.join(dirnameshort,neighbor)])
-                temp.append("neighbor")
-            
-                # If not in edges, we have a new edge, so add it
-                if temp not in edges:
-                    edges.append(temp)
-    
-    # Format the data
-    json_out = "{\n"
-    json_out += "\t\"nodes\":\n\t["
-    for node in nodes:
-        json_out += "\n\t\t{ \"name\": \"" + node[0] + "\", "
-        json_out += "\"lvl\": " + str(node[1]) + ", "
-        json_out += "\"size\": " + str(node[2]) + ", "
-        json_out += "\"sizec\": " + str(node[3]) + ", "
-        json_out += "\"typecount\": \"" + node[4] + "\", "
-        json_out += "\"typesize\": \"" + node[5] + "\" },"
-    json_out = json_out[:-1]
-    json_out += "\n\t],\n"
-    json_out += "\t\"edges\":\n\t["
-    for edge in edges:
-        json_out += "\n\t\t{ \"start\": \"" + edge[0] + "\", "
-        json_out += "\"end\": \"" + edge[1] + "\" },"
-        #json_out += "relation: '" + edge[2] + "' },"
-    json_out = json_out[:-1]
-    json_out += "\n\t]\n}"
-    json_out = json_out.replace("\t", "  ")
-    return json_out
+        if include_hidden or not isHiddenPath(dirname):
+          
+          # Calculate the level
+          level = 0
+          level_temp = dirname.replace(path + "/", "")
+          level_temp = level_temp.replace(path, "")
+          if len(level_temp) != 0:
+              level = level_temp.count("/") + 1
+                  
+          # Put each node into the list of nodes, with dir size and 
+          # size including children
+          dirnameshort = dirname.replace(path, "./").replace("//", "/")
+          dirsize = get_dir_size(dirname)
+          dirsizec = get_dir_size_including_children(dirname)
+          dirfilecount = get_dir_common_count(dirname)
+          dirfilesize = get_dir_common_size(dirname)
+          nodes.append({'name': dirnameshort,
+                        'lvl': level, 
+                        'size': dirsize,
+                        'sizec': dirsizec,
+                        'typecount': dirfilecount,
+                        'typesize': dirfilesize})
+                        
+          # Create parent-child relationships in the edges
+          for subdirname in dirnames:
+              if include_hidden or subdirname[0] != '.':
+                  edges.append({'start': dirnameshort, 'end': os.path.join(dirnameshort,subdirname), 'relation':CHILD_EDGE})
+                  # Create neighbor relationships in the edges
+                  for neighbor in dirnames:
+                      
+                      # Don't create an edge to self
+                      if neighbor != subdirname and (include_hidden or neighbor[0] != '.'):
+                        # Make up a neighbor node, sorted (this prevents duplicates)
+                        edge_ends = sorted([os.path.join(dirnameshort,subdirname),os.path.join(dirnameshort,neighbor)])
+                        neighbor_edge = {'start': edge_ends[0], 'end': edge_ends[1], 'relation':NEIGHBOR_EDGE}
+          
+                        # If not in edges, we have a new edge, so add it
+                        if neighbor_edge not in edges:
+                            edges.append(neighbor_edge)
+                          
+
+    return {'nodes': nodes, 'edges': edges}
 
 # Get the most common file type (based on size) in a path
 def get_dir_common_size(path):
