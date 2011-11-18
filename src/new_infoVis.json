@@ -1,0 +1,86 @@
+{
+    "children": [
+        {
+            "children": [
+                {
+                    "children": [], 
+                    "data": {
+                        "description": "src/css", 
+                        "$color": "#234b9d", 
+                        "typec": ".css", 
+                        "sizec": 2448, 
+                        "lvl": 2, 
+                        "types": ".css", 
+                        "size": 2448
+                    }, 
+                    "id": "../src/css", 
+                    "name": "src/css"
+                }, 
+                {
+                    "children": [], 
+                    "data": {
+                        "description": "src/js", 
+                        "$color": "#7cee3b", 
+                        "typec": ".js", 
+                        "sizec": 170098, 
+                        "lvl": 2, 
+                        "types": ".js", 
+                        "size": 170098
+                    }, 
+                    "id": "../src/js", 
+                    "name": "src/js"
+                }, 
+                {
+                    "children": [], 
+                    "data": {
+                        "description": "src/python", 
+                        "$color": "#d6feab", 
+                        "typec": ".py", 
+                        "sizec": 20806, 
+                        "lvl": 2, 
+                        "types": ".py", 
+                        "size": 20806
+                    }, 
+                    "id": "../src/python", 
+                    "name": "src/python"
+                }
+            ], 
+            "data": {
+                "description": "src", 
+                "$color": "#8e9375", 
+                "typec": ".json", 
+                "sizec": 204887, 
+                "lvl": 1, 
+                "types": "[none]", 
+                "size": 11535
+            }, 
+            "id": "../src", 
+            "name": "src"
+        }, 
+        {
+            "children": [], 
+            "data": {
+                "description": "testdata", 
+                "$color": "#1de754", 
+                "typec": ".json", 
+                "sizec": 54257, 
+                "lvl": 1, 
+                "types": ".json", 
+                "size": 54257
+            }, 
+            "id": "../testdata", 
+            "name": "testdata"
+        }
+    ], 
+    "data": {
+        "description": "", 
+        "$color": "#776036", 
+        "typec": "[none]", 
+        "sizec": 358527, 
+        "lvl": 0, 
+        "types": "[none]", 
+        "size": 6148
+    }, 
+    "id": "../", 
+    "name": "root"
+}

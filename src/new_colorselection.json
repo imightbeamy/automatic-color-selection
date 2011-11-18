@@ -1,0 +1,99 @@
+{
+    "nodes": [
+        {
+            "typecount": "[none]", 
+            "name": "./", 
+            "sizec": 358527, 
+            "lvl": 0, 
+            "typesize": "[none]", 
+            "size": 6148
+        }, 
+        {
+            "typecount": ".json", 
+            "name": "./src", 
+            "sizec": 204887, 
+            "lvl": 1, 
+            "typesize": "[none]", 
+            "size": 11535
+        }, 
+        {
+            "typecount": ".css", 
+            "name": "./src/css", 
+            "sizec": 2448, 
+            "lvl": 2, 
+            "typesize": ".css", 
+            "size": 2448
+        }, 
+        {
+            "typecount": ".js", 
+            "name": "./src/js", 
+            "sizec": 170098, 
+            "lvl": 2, 
+            "typesize": ".js", 
+            "size": 170098
+        }, 
+        {
+            "typecount": ".py", 
+            "name": "./src/python", 
+            "sizec": 20806, 
+            "lvl": 2, 
+            "typesize": ".py", 
+            "size": 20806
+        }, 
+        {
+            "typecount": ".json", 
+            "name": "./testdata", 
+            "sizec": 54257, 
+            "lvl": 1, 
+            "typesize": ".json", 
+            "size": 54257
+        }
+    ], 
+    "edges": [
+        {
+            "start": "./", 
+            "end": "./src", 
+            "relation": "child"
+        }, 
+        {
+            "start": "./src", 
+            "end": "./testdata", 
+            "relation": "neighbor"
+        }, 
+        {
+            "start": "./", 
+            "end": "./testdata", 
+            "relation": "child"
+        }, 
+        {
+            "start": "./src", 
+            "end": "./src/css", 
+            "relation": "child"
+        }, 
+        {
+            "start": "./src/css", 
+            "end": "./src/js", 
+            "relation": "neighbor"
+        }, 
+        {
+            "start": "./src/css", 
+            "end": "./src/python", 
+            "relation": "neighbor"
+        }, 
+        {
+            "start": "./src", 
+            "end": "./src/js", 
+            "relation": "child"
+        }, 
+        {
+            "start": "./src/js", 
+            "end": "./src/python", 
+            "relation": "neighbor"
+        }, 
+        {
+            "start": "./src", 
+            "end": "./src/python", 
+            "relation": "child"
+        }
+    ]
+}
