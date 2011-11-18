@@ -55,10 +55,10 @@ function init(){
           enable: true,
           type: 'Native',
           stylesClick: {
-            'color': '#33dddd'
+            'alpha': .4
           },
           stylesHover: {
-            'color': '#dd3333'
+            'alpha': .8
           }
         },
         //Add tooltips
