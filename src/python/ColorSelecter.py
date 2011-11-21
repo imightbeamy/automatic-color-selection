@@ -7,16 +7,17 @@ from random import random
 import sys 
 import json
 
+#import pdb; pdb.set_trace()
 
 WEIGHT = 'w'
-TYPE = 't'
+TYPE = 'type'
 NAME = 'n'
 
 #Edges that represnet adjacency between nodes of the same level
-SIMILAR_EDGE = 0
+SIMILAR_EDGE = 'pull'
 #Edges that represnet contrains between nodes of the diffrent levels
 #(i.e. The "feeder forces" mentioned in 3.3 of the paper)
-DISSIMILAR_EDGE = 1
+DISSIMILAR_EDGE = 'push'
 EDGE_STYLES = dict([(SIMILAR_EDGE, 'solid'), (DISSIMILAR_EDGE, 'dotted')])
 
 #Example usage
@@ -62,16 +63,17 @@ def displyConstraintGraph(graph, colors=None, save_img=False, filename='Constrai
     nx.draw_networkx_nodes(graph, pos, nodelist=[node], node_color=colors[node])
     
   #draw the edges
-  nodeDict = dict(G.nodes(data=True))
-  for start, end, data in G.edges(data=True):
-    nx.draw_networkx_edges(G, pos, edgelist=[edge], style=EDGE_STYLES[data[TYPE]])
+  #nodeDict = dict(graph.nodes(data=True))
+  #for start, end, data in graph.edges(data=True):
+  #  edge = (start, end)
+  #  nx.draw_networkx_edges(graph, pos, edgelist=[edge], style=EDGE_STYLES[data[TYPE]])
     
   #genterate the label map
   labels = {}
-  for node, data in G.nodes_iter(data=True):
+  for node, data in graph.nodes_iter(data=True):
     labels[node] = data.get(NAME, node)
   #draw the labels
-  nx.draw_networkx_labels(G, pos, labels)
+  nx.draw_networkx_labels(graph, pos, labels)
   if(save_img):
     plt.savefig(filename +'.png')
   plt.show()
@@ -137,10 +139,7 @@ def color_distance(hue1, hue2):
   else:
     return 1 - 2*dif
     
-def getColors(contraint_graph, start_random = True, min_velocity = .001,	momentum_damper = 0.5, 
-              velocity_damper = 0.9999, max_iterations = 10000, force_limit = .5, 
-              max_separation = .3, 
-              separation_wight = .2, adjacency_wight = .5, level_wight = 1.0 ):
+def getColors(contraint_graph, **kwargs):
   """Return a value between 0 and 1 that repesents the
   distance between the hues on the color circle. This
   distance function is defined in equation 3 of the paper.
@@ -158,6 +157,17 @@ def getColors(contraint_graph, start_random = True, min_velocity = .001,	momentu
   Color assinments: A dictionary mapping each node to its hue value. 
          Hues are a float in the range 0 to 1.
   """
+  start_random = kwargs.get('start_random', True)
+  min_velocity = kwargs.get('min_velocity',.001)
+  momentum_damper = kwargs.get('momentum_damper',0.5)
+  velocity_damper = kwargs.get('velocity_damper',0.9999)
+  max_iterations = kwargs.get('max_iterations',10000)
+  force_limit = kwargs.get('force_limit',1)
+  max_separation = kwargs.get('max_separation',.3)
+  separation_weight = kwargs.get('separation_weight',1.0)
+  similarity_weight = kwargs.get('similarity_weight',0)
+  dissimilarity_weight = kwargs.get('dissimilarity_weight',0)  
+
   G = contraint_graph
   
   #set initial colors
@@ -165,7 +175,7 @@ def getColors(contraint_graph, start_random = True, min_velocity = .001,	momentu
   if start_random:
     #Assign each node a random hue
     for node in G.nodes_iter(data=False):
-      colors[node] = random()
+      colors[node] = .5 + .001*random()
   else:
     #Assign the nodes hues that are evenly distibuted
     count = 0
@@ -188,46 +198,52 @@ def getColors(contraint_graph, start_random = True, min_velocity = .001,	momentu
   while iterations < max_iterations:
     iterations+=1
     damper_current = damper_current*velocity_damper
-    for node in G.nodes_iter(data=False):
-      neighbors = G.neighbors(node)
-      current_node_data = node_data[node]
-      force = 0
-      #calculate the neighbor forces
-      for neighbor in neighbors:
-        neighbor_data = node_data[neighbor]
-        try:
-          if neighbor_data['level'] < current_node_data['level']:
-            force+=calculateInterlevelForce(colors[node], colors[neighbor])
-          if neighbor_data['level'] > current_node_data['level']:
-            force+=calculateInterlevelForce(colors[neighbor], colors[node])
-          else:
-            force+=calculateAdjacencyForce(colors[node], colors[neighbor])
-        except:
-          pass
-      #calculate the spread forces
-      for other in G.nodes_iter():
-        force+=calculateSeparationForce(colors[node], colors[other], max_separation)
-      colors[node] = apply_force(colors[node], force*damper_current, force_limit)
+    
+    
+    #calculate the spread forces
+    for node in G.nodes_iter():
+      non_ajs_nodes =  set(node_data.keys()) - set([n for n in G[node] if G[node][n][TYPE] == SIMILAR_EDGE])
+      #import pdb; pdb.set_trace()
+      #print node, non_ajs_nodes
+      for n in non_ajs_nodes:
+        #forces[node] = momentum_damper*forces[node]
+        forces[node]+=calculateSeparationForce(colors[node], colors[n], max_separation)*separation_weight
+    
+    #Do the contraint edges 
+    for start, end, data in G.edges_iter(data=True):
+      type = data[TYPE]
+      if type == SIMILAR_EDGE:
+        force = calculatePullingForce(colors[start], colors[end])*dissimilarity_weight
+      elif type == DISSIMILAR_EDGE:
+        force = calculatePushingForce(colors[start], colors[end])*similarity_weight
+      forces[start]+=force
+      forces[end]+=force
+      
+    for node in G.nodes_iter():
+      colors[node] = apply_force(colors[node], forces[node]*damper_current, force_limit)
+#      print colors[node]
+      forces[node] = 0
 
   return colors
 
 #Equation 7
-def calculateAdjacencyForce(node_color1, node_color2, weight=1):
+def calculatePushingForce(node_color1, node_color2, weight=1):
   return (1 - color_distance(node_color1, node_color2))**2
   
 #Equation 8
 #weight would be a list of the feeder patern ratio 
-def calculateInterlevelForce(node_color, incoming_node_color, incoming_node_weight=1):
+def calculatePullingForce(node_color, incoming_node_color, incoming_node_weight=1):
   return color_distance(node_color, incoming_node_color)*incoming_node_weight
  
+#Equation 9
 def calculateSeparationForce(node_color1, node_color2, max_separation):
-  return 1 - color_distance(node_color1, node_color2)/max_separation
+  color_dist = color_distance(node_color1, node_color2)
+  if color_dist < max_separation:
+    return 1 - (color_dist/max_separation)
+  else:
+    return 0
   
 def apply_force(hue, force, force_limit):
-  if force > force_limit:
-    force = force_limit
-  elif force < -force_limit:
-    force = -force_limit
   hue+=force
   while hue >= 1.0:
     hue -= 1.0

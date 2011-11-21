@@ -26,10 +26,11 @@ def main():
   #Get colors from paper algorithim
   hues = cs.hues_to_rgb(cs.getColors(graph))
   colors = dict([node,list_to_color(color)] for node, color in hues.iteritems())
-  
+
   infovid_json = fsg.gen_infoVis_format(path,path,color_map=colors)
   print json.dumps(infovid_json)
-
+  cs.displyConstraintGraph(graph,colors)
+  
 def list_to_color(color):
   return '#' + ''.join(['%02x'%(i*255) for i in color])
   
