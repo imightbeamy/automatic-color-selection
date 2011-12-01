@@ -64,8 +64,8 @@ def gen_infoVis_format(path, root, color_map=None, include_hidden=False):
     return []
 
 def isHiddenPath(path):
-  path = os.path.abspath(path).split('/')
-  return [dir for dir in path if dir and dir[0]=='.'] != []
+    path = os.path.abspath(path).split('/')
+    return [dir for dir in path if dir and dir[0]=='.'] != []
 
 # Generate the data for the nodes and edges
 def gen_filesys_graph(path, include_hidden=False):
@@ -96,7 +96,7 @@ def gen_filesys_graph(path, include_hidden=False):
                         'sizec': dirsizec,
                         'typecount': dirfilecount,
                         'typesize': dirfilesize})
-                        
+          
           # Create parent-child relationships in the edges
           for subdirname in dirnames:
               if include_hidden or subdirname[0] != '.':
@@ -113,9 +113,24 @@ def gen_filesys_graph(path, include_hidden=False):
                         # If not in edges, we have a new edge, so add it
                         if neighbor_edge not in edges:
                             edges.append(neighbor_edge)
-                          
+
+    for edge in edges:
+        
+        if edge['relation'] == CHILD_EDGE:
+            for dirname, dirnames, filenames in os.walk(os.path.join(path, edge['start'][2:])):
+                ctotal = 0
+                ctotalc = 0
+                for dir in dirnames:
+                    ctotal += get_dir_size(dirname + "/" + dir)
+                    ctotalc += get_dir_size_including_children(dirname + "/" + dir)
+                cweight = get_dir_size(os.path.join(path, edge['end'][2:])) / float(ctotal)
+                cweightc = get_dir_size_including_children(os.path.join(path, edge['end'][2:])) / float(ctotalc)
+                edge['weight'] = cweight
+                edge['weightc'] = cweightc
+                break
 
     return {'nodes': nodes, 'edges': edges}
+
 
 # Get the most common file type (based on size) in a path
 def get_dir_common_size(path):

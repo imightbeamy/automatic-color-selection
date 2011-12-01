@@ -7,6 +7,7 @@ from random import random
 import sys 
 import json
 
+#Debuging
 #import pdb; pdb.set_trace()
 
 WEIGHT = 'w'
@@ -63,10 +64,10 @@ def displyConstraintGraph(graph, colors=None, save_img=False, filename='Constrai
     nx.draw_networkx_nodes(graph, pos, nodelist=[node], node_color=colors[node])
     
   #draw the edges
-  #nodeDict = dict(graph.nodes(data=True))
-  #for start, end, data in graph.edges(data=True):
-  #  edge = (start, end)
-  #  nx.draw_networkx_edges(graph, pos, edgelist=[edge], style=EDGE_STYLES[data[TYPE]])
+  nodeDict = dict(graph.nodes(data=True))
+  for start, end, data in graph.edges(data=True):
+    edge = (start, end)
+    nx.draw_networkx_edges(graph, pos, edgelist=[edge], style=EDGE_STYLES[data[TYPE]])
     
   #genterate the label map
   labels = {}
@@ -117,10 +118,17 @@ def buildConstraintGraph(nodes, edges, **kwargs):
 
   return G
 
+#Equation 3
 def color_distance(hue1, hue2):
   """Return a value between 0 and 1 that repesents the
   distance between the hues on the color circle. This
   distance function is defined in equation 3 of the paper.
+  
+  A small corection was made to make the euqation match the 
+  description and expected output.In the paper, 2*dif was used 
+  when dif was < than .5 (rathar than <=) which caused colors on
+  opposite sides of the circle to have a distance of 0 when it 
+  should be 1. 
   
   Parameters
   ----------
@@ -134,7 +142,7 @@ def color_distance(hue1, hue2):
     0 corresponds to the same color
   """
   dif = abs(hue1 - hue2)
-  if dif < .5:
+  if dif <= .5:
     return 2*dif
   else:
     return 1 - 2*dif
@@ -161,13 +169,13 @@ def getColors(contraint_graph, **kwargs):
   min_velocity = kwargs.get('min_velocity',.001)
   momentum_damper = kwargs.get('momentum_damper',0.5)
   velocity_damper = kwargs.get('velocity_damper',0.9999)
-  max_iterations = kwargs.get('max_iterations',10000)
+  max_iterations = kwargs.get('max_iterations',50000)
   force_limit = kwargs.get('force_limit',1)
-  max_separation = kwargs.get('max_separation',.3)
-  separation_weight = kwargs.get('separation_weight',1.0)
-  similarity_weight = kwargs.get('similarity_weight',0)
-  dissimilarity_weight = kwargs.get('dissimilarity_weight',0)  
-
+  max_separation = kwargs.get('max_separation',.5)
+  separation_weight = kwargs.get('separation_weight', 0)
+  similarity_weight = kwargs.get('similarity_weight',.2)
+  dissimilarity_weight = kwargs.get('dissimilarity_weight', .5)  
+  visdata = {}
   G = contraint_graph
   
   #set initial colors
@@ -175,7 +183,7 @@ def getColors(contraint_graph, **kwargs):
   if start_random:
     #Assign each node a random hue
     for node in G.nodes_iter(data=False):
-      colors[node] = .5 + .001*random()
+      colors[node] = random()
   else:
     #Assign the nodes hues that are evenly distibuted
     count = 0
@@ -184,8 +192,8 @@ def getColors(contraint_graph, **kwargs):
       colors[node] = hue_spacing * count
       count+=1
   
-  
-      
+  steps = int(max_iterations/100)
+  print max_separation
   node_list = G.nodes(data=True)
   node_data = {}
   forces = {}
@@ -193,37 +201,50 @@ def getColors(contraint_graph, **kwargs):
     node_data[node] = data
     forces[node] = 0
      
-  damper_current = 1
+  damper_current = 1.0
   iterations = 0
   while iterations < max_iterations:
-    iterations+=1
+
+    if iterations % steps == 0:
+      for c in colors:
+        if c not in visdata.keys():
+          visdata[c] = []
+        visdata[c].append(colors[c])
+
+    iterations+=1    
     damper_current = damper_current*velocity_damper
     
     
     #calculate the spread forces
     for node in G.nodes_iter():
-      non_ajs_nodes =  set(node_data.keys()) - set([n for n in G[node] if G[node][n][TYPE] == SIMILAR_EDGE])
-      #import pdb; pdb.set_trace()
-      #print node, non_ajs_nodes
-      for n in non_ajs_nodes:
+      for other in G.nodes_iter():
         #forces[node] = momentum_damper*forces[node]
-        forces[node]+=calculateSeparationForce(colors[node], colors[n], max_separation)*separation_weight
-    
+        if node != other: 
+          force = calculateSeparationForce(colors[node], colors[other], max_separation)
+          #print colors[node], colors[other],force, pushing_force_direction(colors[node], colors[other])
+          force*=pushing_force_direction(colors[node], colors[other])
+          #print colors[node], colors[other],pushing_force_direction(colors[node], colors[other])
+          forces[node]+=force*separation_weight
+
     #Do the contraint edges 
     for start, end, data in G.edges_iter(data=True):
       type = data[TYPE]
       if type == SIMILAR_EDGE:
-        force = calculatePullingForce(colors[start], colors[end])*dissimilarity_weight
+        force = calculatePullingForce(colors[start], colors[end])
+        force*=similarity_weight*data[WEIGHT]*-pushing_force_direction(colors[start], colors[end])
       elif type == DISSIMILAR_EDGE:
-        force = calculatePushingForce(colors[start], colors[end])*similarity_weight
+        force = calculatePushingForce(colors[start], colors[end])
+        force*=dissimilarity_weight*data[WEIGHT]*pushing_force_direction(colors[start], colors[end])
+
       forces[start]+=force
-      forces[end]+=force
+      forces[end]-=force
       
     for node in G.nodes_iter():
-      colors[node] = apply_force(colors[node], forces[node]*damper_current, force_limit)
-#      print colors[node]
+      colors[node] = apply_force(colors[node], forces[node]*damper_current)
       forces[node] = 0
 
+  for node in visdata:
+    print node, '\t', '\t'.join([ str(x) for x in visdata[node]])
   return colors
 
 #Equation 7
@@ -238,18 +259,25 @@ def calculatePullingForce(node_color, incoming_node_color, incoming_node_weight=
 #Equation 9
 def calculateSeparationForce(node_color1, node_color2, max_separation):
   color_dist = color_distance(node_color1, node_color2)
-  if color_dist < max_separation:
-    return 1 - (color_dist/max_separation)
-  else:
-    return 0
+  return 1 - (color_dist/max_separation)
   
-def apply_force(hue, force, force_limit):
+def apply_force(hue, force):
   hue+=force
   while hue >= 1.0:
     hue -= 1.0
   while hue < 0.0:
     hue += 1.0
   return hue
+
+def pushing_force_direction(hue_applying, hue_reciving):
+  dif = hue_reciving + ( 1 - hue_applying )
+  while dif > 1.0:
+    dif-=1.0
+  if dif  > .5:
+    return 1
+  return -1
+  
+  
 
 def HSL_to_RGB(hue, sat, lit):
   chroma = (1 - abs(2 * lit - 1)) * sat
