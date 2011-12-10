@@ -123,8 +123,13 @@ def gen_filesys_graph(path, include_hidden=False):
                 for dir in dirnames:
                     ctotal += get_dir_size(dirname + "/" + dir)
                     ctotalc += get_dir_size_including_children(dirname + "/" + dir)
-                cweight = get_dir_size(os.path.join(path, edge['end'][2:])) / float(ctotal)
-                cweightc = get_dir_size_including_children(os.path.join(path, edge['end'][2:])) / float(ctotalc)
+                if ctotal != 0:
+                    cweight = get_dir_size(os.path.join(path, edge['end'][2:])) / float(ctotal)
+                    cweightc = get_dir_size_including_children(os.path.join(path, edge['end'][2:])) / float(ctotalc)
+                else:
+                    cweight = 1
+                    cweightc = 1
+                    
                 edge['weight'] = cweight
                 edge['weightc'] = cweightc
                 break

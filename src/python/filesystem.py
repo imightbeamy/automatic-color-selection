@@ -19,7 +19,8 @@ def main():
   keys = {'type_key': 'relation',
           'similar_type': fsg.CHILD_EDGE,
           'dissimilar_type': fsg.NEIGHBOR_EDGE,
-          'id_key': 'name'}
+          'id_key': 'name',
+          'weight_key': 'weightc'}
           
   graph = cs.buildConstraintGraph(nodes, edges, **keys)
 

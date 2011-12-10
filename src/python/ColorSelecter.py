@@ -147,11 +147,8 @@ def color_distance(hue1, hue2):
   else:
     return 1 - 2*dif
     
-def getColors(contraint_graph, **kwargs):
-  """Return a value between 0 and 1 that repesents the
-  distance between the hues on the color circle. This
-  distance function is defined in equation 3 of the paper.
-  
+def getColors(contraint_graph, debug=True , **kwargs):
+  """  
   Parameters
   ----------
   contraint_graph : A networkx graph representing the color contraints.
@@ -165,16 +162,16 @@ def getColors(contraint_graph, **kwargs):
   Color assinments: A dictionary mapping each node to its hue value. 
          Hues are a float in the range 0 to 1.
   """
-  start_random = kwargs.get('start_random', True)
+  start_random = kwargs.get('start_random',False)
   min_velocity = kwargs.get('min_velocity',.001)
   momentum_damper = kwargs.get('momentum_damper',0.5)
   velocity_damper = kwargs.get('velocity_damper',0.9999)
   max_iterations = kwargs.get('max_iterations',50000)
   force_limit = kwargs.get('force_limit',1)
   max_separation = kwargs.get('max_separation',.5)
-  separation_weight = kwargs.get('separation_weight', 0)
-  similarity_weight = kwargs.get('similarity_weight',.2)
-  dissimilarity_weight = kwargs.get('dissimilarity_weight', .5)  
+  separation_weight = kwargs.get('separation_weight',1.0)
+  similarity_weight = kwargs.get('similarity_weight',.0)
+  dissimilarity_weight = kwargs.get('dissimilarity_weight', .0)  
   visdata = {}
   G = contraint_graph
   
@@ -191,21 +188,28 @@ def getColors(contraint_graph, **kwargs):
     for node in G.nodes_iter(data=False):
       colors[node] = hue_spacing * count
       count+=1
+ 
+ 
+  if(debug):
+    steps = int(max_iterations/100)
   
-  steps = int(max_iterations/100)
-  print max_separation
+  #Create dictionary to hold the force on each node 
+  #Grab all node data from the graph
   node_list = G.nodes(data=True)
   node_data = {}
   forces = {}
   for node, data in node_list:
     node_data[node] = data
     forces[node] = 0
-     
+
+
+  max_separation =  .5
   damper_current = 1.0
   iterations = 0
   while iterations < max_iterations:
-
-    if iterations % steps == 0:
+    
+    #Print out debug info 
+    if debug and iterations % steps == 0:
       for c in colors:
         if c not in visdata.keys():
           visdata[c] = []
@@ -219,11 +223,9 @@ def getColors(contraint_graph, **kwargs):
     for node in G.nodes_iter():
       for other in G.nodes_iter():
         #forces[node] = momentum_damper*forces[node]
-        if node != other: 
+        if node != other:
           force = calculateSeparationForce(colors[node], colors[other], max_separation)
-          #print colors[node], colors[other],force, pushing_force_direction(colors[node], colors[other])
-          force*=pushing_force_direction(colors[node], colors[other])
-          #print colors[node], colors[other],pushing_force_direction(colors[node], colors[other])
+          force*= pushing_force_direction(colors[node], colors[other])
           forces[node]+=force*separation_weight
 
     #Do the contraint edges 
@@ -243,8 +245,9 @@ def getColors(contraint_graph, **kwargs):
       colors[node] = apply_force(colors[node], forces[node]*damper_current)
       forces[node] = 0
 
-  for node in visdata:
-    print node, '\t', '\t'.join([ str(x) for x in visdata[node]])
+  if debug:
+    for node in visdata:
+      print node, '\t', '\t'.join([ str(x) for x in visdata[node]])
   return colors
 
 #Equation 7
@@ -259,8 +262,10 @@ def calculatePullingForce(node_color, incoming_node_color, incoming_node_weight=
 #Equation 9
 def calculateSeparationForce(node_color1, node_color2, max_separation):
   color_dist = color_distance(node_color1, node_color2)
-  return 1 - (color_dist/max_separation)
-  
+  if color_dist <= max_separation:
+    return (color_dist - max_separation)**2/max_separation**2
+  return 0
+
 def apply_force(hue, force):
   hue+=force
   while hue >= 1.0:
@@ -302,7 +307,7 @@ def HSL_to_RGB(hue, sat, lit):
   return [x + m for x in rgb]
     
 def randomColor():
-  return [random() for i in range(3)]
+  return [random() for i in xrange(3)]
 
 
 if __name__ == '__main__':
