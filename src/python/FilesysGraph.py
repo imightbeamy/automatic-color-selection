@@ -5,8 +5,10 @@ from random import randint
 import json
 import string
 
+
 CHILD_EDGE = 'child'
 NEIGHBOR_EDGE = 'neighbor'
+FILE_TYPE_EDGE = 'file'
 
 def main():
     # Default path is the current directory
@@ -71,6 +73,7 @@ def isHiddenPath(path):
 def gen_filesys_graph(path, include_hidden=False):
     nodes = []
     edges = []
+    edgesfile = []
     
     # Walk the path and get the directories
     for dirname, dirnames, filenames in os.walk(path):
@@ -114,8 +117,21 @@ def gen_filesys_graph(path, include_hidden=False):
                         if neighbor_edge not in edges:
                             edges.append(neighbor_edge)
 
+
+    for node in nodes:
+        for node2 in nodes:
+            if node['name'] == node2['name']:
+                continue
+            thetype = 'typecount'
+            if node[thetype] == node2[thetype]:
+                edge_ends = sorted([node['name'], node2['name']])
+                file_edge = {'start': edge_ends[0], 'end': edge_ends[1], 'relation':FILE_TYPE_EDGE}
+                if file_edge not in edgesfile:
+                    edgesfile.append(file_edge)
+                
+
+    # calculate the edge weights
     for edge in edges:
-        
         if edge['relation'] == CHILD_EDGE:
             for dirname, dirnames, filenames in os.walk(os.path.join(path, edge['start'][2:])):
                 ctotal = 0
@@ -134,7 +150,7 @@ def gen_filesys_graph(path, include_hidden=False):
                 edge['weightc'] = cweightc
                 break
 
-    return {'nodes': nodes, 'edges': edges}
+    return {'nodes': nodes, 'edges': edges, 'edgesfile': edgesfile}
 
 
 # Get the most common file type (based on size) in a path
