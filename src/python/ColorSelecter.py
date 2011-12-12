@@ -147,7 +147,7 @@ def color_distance(hue1, hue2):
   else:
     return 1 - 2*dif
     
-def getColors(contraint_graph, debug=True , **kwargs):
+def getColors(contraint_graph, debug=False , **kwargs):
   """  
   Parameters
   ----------
@@ -168,10 +168,10 @@ def getColors(contraint_graph, debug=True , **kwargs):
   velocity_damper = kwargs.get('velocity_damper',0.9999)
   max_iterations = kwargs.get('max_iterations',50000)
   force_limit = kwargs.get('force_limit',1)
-  max_separation = kwargs.get('max_separation',.5)
-  separation_weight = kwargs.get('separation_weight',1.0)
-  similarity_weight = kwargs.get('similarity_weight',.0)
-  dissimilarity_weight = kwargs.get('dissimilarity_weight', .0)  
+  max_separation = kwargs.get('max_separation', 0.3)
+  separation_weight = kwargs.get('separation_weight',.2)
+  similarity_weight = kwargs.get('similarity_weight',1.0)
+  dissimilarity_weight = kwargs.get('dissimilarity_weight', 1.0)  
   visdata = {}
   G = contraint_graph
   
@@ -203,7 +203,7 @@ def getColors(contraint_graph, debug=True , **kwargs):
     forces[node] = 0
 
 
-  max_separation =  .5
+  max_separation = .03
   damper_current = 1.0
   iterations = 0
   while iterations < max_iterations:
@@ -224,7 +224,7 @@ def getColors(contraint_graph, debug=True , **kwargs):
       for other in G.nodes_iter():
         #forces[node] = momentum_damper*forces[node]
         if node != other:
-          force = calculateSeparationForce(colors[node], colors[other], max_separation)
+          force = calculatePushingForce(colors[node], colors[other])
           force*= pushing_force_direction(colors[node], colors[other])
           forces[node]+=force*separation_weight
 

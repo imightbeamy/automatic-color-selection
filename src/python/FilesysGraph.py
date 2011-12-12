@@ -9,6 +9,7 @@ import string
 CHILD_EDGE = 'child'
 NEIGHBOR_EDGE = 'neighbor'
 FILE_TYPE_EDGE = 'file'
+FILE_TYPE_EDGE_NOT = 'fnot'
 
 def main():
     # Default path is the current directory
@@ -128,7 +129,12 @@ def gen_filesys_graph(path, include_hidden=False):
                 file_edge = {'start': edge_ends[0], 'end': edge_ends[1], 'relation':FILE_TYPE_EDGE}
                 if file_edge not in edgesfile:
                     edgesfile.append(file_edge)
-                
+            else: 
+                edge_ends = sorted([node['name'], node2['name']])
+                file_edge = {'start': edge_ends[0], 'end': edge_ends[1], 'relation':FILE_TYPE_EDGE_NOT}
+                if file_edge not in edgesfile:
+                    edgesfile.append(file_edge)
+
 
     # calculate the edge weights
     for edge in edges:
