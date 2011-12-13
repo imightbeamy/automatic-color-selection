@@ -67,7 +67,7 @@ def displyConstraintGraph(graph, colors=None, save_img=False, filename='Constrai
   nodeDict = dict(graph.nodes(data=True))
   for start, end, data in graph.edges(data=True):
     edge = (start, end)
-    nx.draw_networkx_edges(graph, pos, edgelist=[edge], style=EDGE_STYLES[data[TYPE]])
+    nx.draw_networkx_edges(graph, pos, edgelist=[edge], width=5*data[WEIGHT], style=EDGE_STYLES[data[TYPE]])
     
   #genterate the label map
   labels = {}
@@ -162,13 +162,13 @@ def getColors(contraint_graph, debug=False , **kwargs):
   Color assinments: A dictionary mapping each node to its hue value. 
          Hues are a float in the range 0 to 1.
   """
-  start_random = kwargs.get('start_random',False)
+  start_random = kwargs.get('start_random', False)
   min_velocity = kwargs.get('min_velocity',.001)
-  momentum_damper = kwargs.get('momentum_damper',0.5)
+  momentum_damper = kwargs.get('momentum_damper',0.4)
   velocity_damper = kwargs.get('velocity_damper',0.9999)
-  max_iterations = kwargs.get('max_iterations',50000)
+  max_iterations = kwargs.get('max_iterations',10000)
   force_limit = kwargs.get('force_limit',1)
-  max_separation = kwargs.get('max_separation', 0.3)
+  max_separation = kwargs.get('max_separation', 0.5)
   separation_weight = kwargs.get('separation_weight',.2)
   similarity_weight = kwargs.get('similarity_weight',1.0)
   dissimilarity_weight = kwargs.get('dissimilarity_weight', 1.0)  
@@ -180,7 +180,7 @@ def getColors(contraint_graph, debug=False , **kwargs):
   if start_random:
     #Assign each node a random hue
     for node in G.nodes_iter(data=False):
-      colors[node] = random()
+      colors[node] = .5+.0001*random()
   else:
     #Assign the nodes hues that are evenly distibuted
     count = 0
@@ -191,6 +191,7 @@ def getColors(contraint_graph, debug=False , **kwargs):
  
  
   if(debug):
+    print max_separation
     steps = int(max_iterations/100)
   
   #Create dictionary to hold the force on each node 
@@ -203,7 +204,6 @@ def getColors(contraint_graph, debug=False , **kwargs):
     forces[node] = 0
 
 
-  max_separation = .03
   damper_current = 1.0
   iterations = 0
   while iterations < max_iterations:
@@ -224,9 +224,9 @@ def getColors(contraint_graph, debug=False , **kwargs):
       for other in G.nodes_iter():
         #forces[node] = momentum_damper*forces[node]
         if node != other:
-          force = calculatePushingForce(colors[node], colors[other])
+          force = calculateSeparationForce(colors[node], colors[other],max_separation)
           force*= pushing_force_direction(colors[node], colors[other])
-          forces[node]+=force*separation_weight
+          forces[node]-=force*separation_weight
 
     #Do the contraint edges 
     for start, end, data in G.edges_iter(data=True):
@@ -263,7 +263,8 @@ def calculatePullingForce(node_color, incoming_node_color, incoming_node_weight=
 def calculateSeparationForce(node_color1, node_color2, max_separation):
   color_dist = color_distance(node_color1, node_color2)
   if color_dist <= max_separation:
-    return (color_dist - max_separation)**2/max_separation**2
+    return 1 - (color_dist/max_separation)
+    #return 1 - (color_dist**16/max_separation**16)
   return 0
 
 def apply_force(hue, force):
@@ -278,7 +279,7 @@ def pushing_force_direction(hue_applying, hue_reciving):
   dif = hue_reciving + ( 1 - hue_applying )
   while dif > 1.0:
     dif-=1.0
-  if dif  > .5:
+  if dif > .5:
     return 1
   return -1
   
