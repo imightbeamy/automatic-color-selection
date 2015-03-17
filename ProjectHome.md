@@ -1,0 +1,1 @@
+A generic method based on force-directed layout that optimizes color sets used to visualize multiple related categorical properties on maps.
